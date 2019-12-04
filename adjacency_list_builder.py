@@ -4,24 +4,21 @@ import json
 import os.path
 from collections import defaultdict
 
-first_phase_json_cache_pages = 'pages_after_first_step.json'
-first_phase_json_cache_title_cache = 'title_cache_after_first_step.json'
-second_phase_json_cache_pages = 'pages_after_second_step.json'
+first_phase_json_cache_links = '1st_phase_links.json'
+first_phase_json_cache_title_cache = '1st_phase_title_cache.json'
+second_phase_json_cache_links = '2nd_phase_links_FULL_SOLUTION.json'
 
-pages = defaultdict(dict) # pages[namespace_id][page_id] = {'page_title':"someTitle", adj_list=[(namespace_id, page_id), (namespace_id, page_id)]}
-title_cache = defaultdict(dict) # pages[namespace_id][page_id] = {'page_title':"someTitle", adj_list=[(namespace_id, page_id), (namespace_id, page_id)]}
+links = defaultdict(dict) # links[namespace_id][page_id] = {namespace_id:[1,4,5]}
+title_cache = defaultdict(dict)
 
-#tworzenie listy węzłów w postaci słownika
-pages_pattern = re.compile("\\((\d+),(.+?),'(.*?)',.*?,NULL\\)")
-
-if os.path.isfile(second_phase_json_cache_pages):
+if os.path.isfile(second_phase_json_cache_links):
     print("Full solution cache available. Reading the pages...")
-    with open(first_phase_json_cache_pages, 'r') as f:
+    with open(first_phase_json_cache_links, 'r') as f:
         pages = json.load(f)
-else
-    if os.path.isfile(first_phase_json_cache_pages) and os.path.isfile(first_phase_json_cache_title_cache):
+else:
+    if os.path.isfile(first_phase_json_cache_links) and os.path.isfile(first_phase_json_cache_title_cache):
         print("Cache available. Reading the pages...")
-        with open(first_phase_json_cache_pages, 'r') as f:
+        with open(first_phase_json_cache_links, 'r') as f:
             pages = json.load(f)
         print("Reading title to id lookup table...")
         with open(first_phase_json_cache_title_cache, 'r') as f:
@@ -29,6 +26,7 @@ else
         print("Cache successfully restored")
     else:
         print("No cache available")
+        pages_pattern = re.compile("\\((\d+),(.+?),'(.*?)',.*?,NULL\\)")
         with open("data/plwiki-latest-page.sql", "r", encoding="utf8") as file:
             counter = 0
             for line in file:
@@ -36,16 +34,16 @@ else
                     page_id = int(match.group(1))
                     namespace_id = int(match.group(2))
                     title = match.group(3)
-                    pages[namespace_id][page_id] = dict(page_title=title, adj_list=list())
+                    links[namespace_id][page_id] = defaultdict(list)
                     title_cache[namespace_id][title] = page_id
 
                     counter += 1
-                    if counter % 10000 == 0:
+                    if counter % 100000 == 0:
                         print("Pages processed: " + str(counter//1000) + "k")
 
         print("Pages processed. Caching pages...")
-        with open(first_phase_json_cache_pages, 'w') as fp:
-            json.dump(pages, fp)
+        with open(first_phase_json_cache_links, 'w') as fp:
+            json.dump(links, fp)
         print("Pages cached. Caching title to id lookup table...")
         with open(first_phase_json_cache_title_cache, 'w') as fp:
             json.dump(title_cache, fp)
@@ -65,21 +63,18 @@ else
                     to_id = 0
                     try:
                         to_id = title_cache[to_namespace][to_title]
+                        links[from_namespace][from_id][to_namespace].append(to_id)
                     except:
                         # links may be invalid, as stated: https://www.mediawiki.org/wiki/Manual:Pagelinks_table
                         continue
-                    try:
-                        pages[from_namespace][from_id]['adj_list'].append((to_namespace, to_id))
-                    except:
-                        continue
 
                     counter += 1
-                    if counter % 10000 == 0:
-                        print("Links processed: " + str(counter//1000) + "k")
+                    if counter % 1000000 == 0:
+                        print("Links processed: " + str(counter//1000000) + "kk")
 
-        with open(second_phase_json_cache_pages, 'w') as fp:
-            json.dump(pages, fp)
+        print("Links processed. Caching pages with links...")
+        with open(second_phase_json_cache_links, 'w') as fp:
+            json.dump(links, fp)
+        print("Caching done")
 
-
-
-print("Number of pages stored: " + str(len(pages)))
+print("Number of pages with links stored: " + str(len(links)))
