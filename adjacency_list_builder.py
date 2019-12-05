@@ -81,4 +81,5 @@ def generate_pages_links():
     return links
 
 links = generate_pages_links()
-print("Number of pages with links stored: " + str(len(links)))
+namespaces_sizes = [len(pages_in_namespace) for pages_in_namespace in links.values()]
+print("Number of pages with links stored: " + str(sum(namespaces_sizes)))
