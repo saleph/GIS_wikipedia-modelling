@@ -83,3 +83,9 @@ def generate_pages_links():
 links = generate_pages_links()
 namespaces_sizes = [len(pages_in_namespace) for pages_in_namespace in links.values()]
 print("Number of pages with links stored: " + str(sum(namespaces_sizes)))
+
+first_namespace_dict = list(links.values())[0]
+first_page_links_per_namespace = list(first_namespace_dict.values())[0]
+print("first_page_links_per_namespace:")
+for namespace_id, page_links in first_page_links_per_namespace.items():
+    print("namespace:", namespace_id, page_links)
