@@ -12,14 +12,14 @@ links = defaultdict(dict) # links[namespace_id][page_id] = {namespace_id:[1,4,5]
 title_cache = defaultdict(dict)
 
 if os.path.isfile(second_phase_json_cache_links):
-    print("Full solution cache available. Reading the pages...")
-    with open(first_phase_json_cache_links, 'r') as f:
-        pages = json.load(f)
+    print("Full solution cache available. Reading the pages with links, will take a long time...")
+    with open(second_phase_json_cache_links, 'r') as f:
+        links = json.load(f)
 else:
     if os.path.isfile(first_phase_json_cache_links) and os.path.isfile(first_phase_json_cache_title_cache):
-        print("Cache available. Reading the pages...")
+        print("Cache available. Reading the pages without links...")
         with open(first_phase_json_cache_links, 'r') as f:
-            pages = json.load(f)
+            links = json.load(f)
         print("Reading title to id lookup table...")
         with open(first_phase_json_cache_title_cache, 'r') as f:
             title_cache = json.load(f)
