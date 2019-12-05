@@ -15,7 +15,7 @@ def _prepare_title_cache(pages):
     title_cache = defaultdict(dict)
     pages_pattern = re.compile("\\((\\d+),(.+?),'(.*?)',.*?,NULL\\)")
     with open(pages, "r", encoding="utf8") as file:
-        print("Start of the pages processing (around 3100k)")
+        print("Start of the pages processing (around 1300k)")
         counter = 0
         for line in file:
             for match in re.finditer(pages_pattern, line):
@@ -33,7 +33,7 @@ def _prepare_title_cache(pages):
 def _prepare_graph(pagelinks, title_cache):
     G = nx.Graph()
     pattern_links = re.compile("\\((\\d+),(\\d+),'(.*?)',(\\d+)\\)[,;]")
-    print("Start of the links processing (around 158kk) and graph generation")
+    print("Start of the links processing (around 59kk) and graph generation")
     with open(pagelinks, "r", encoding="utf8") as file:
         counter = 0
         for line in file:
