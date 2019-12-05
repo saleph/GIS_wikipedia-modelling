@@ -2,15 +2,19 @@
 import re
 import json
 import os.path
+import pathlib
 from collections import defaultdict
 
-first_phase_json_cache_links = '1st_phase_links.json'
-first_phase_json_cache_title_cache = '1st_phase_title_cache.json'
-second_phase_json_cache_links = '2nd_phase_links_FULL_SOLUTION.json'
-
 def generate_pages_links():
+    first_phase_json_cache_links = 'cache1/1st_phase_links.json'
+    first_phase_json_cache_title_cache = 'cache1/1st_phase_title_cache.json'
+    second_phase_json_cache_links = 'cache1/2nd_phase_links_FULL_SOLUTION.json'
+    dir_with_sql = "C:/Users/tomas/Downloads/data/"
+
     links = defaultdict(dict) # links[namespace_id][page_id] = {namespace_id:[1,4,5]}
     title_cache = defaultdict(dict)
+
+    pathlib.Path('cache1').mkdir(exist_ok=True)
 
     if os.path.isfile(second_phase_json_cache_links):
         print("Full solution cache available. Reading the pages with links, will take a long time...")
@@ -28,7 +32,7 @@ def generate_pages_links():
         else:
             print("No cache available")
             pages_pattern = re.compile("\\((\d+),(.+?),'(.*?)',.*?,NULL\\)")
-            with open("C:/Users/togal1/Downloads/data/plwiki-latest-page.sql", "r", encoding="utf8") as file:
+            with open(dir_with_sql + "plwiki-latest-page.sql", "r", encoding="utf8") as file:
                 print("Start of the pages processing (around 3100k)")
                 counter = 0
                 for line in file:
@@ -52,8 +56,8 @@ def generate_pages_links():
             print("All the caching done")
 
         pattern_links = re.compile("\\((\d+),(\d+),'(.*?)',(\d+)\\)[,;]")
-        with open("C:/Users/togal1/Downloads/data/plwiki-latest-pagelinks.sql", "r", encoding="utf8") as file:
-            print("Start of the links processing (around 150kk)")
+        with open(dir_with_sql + "plwiki-latest-pagelinks.sql", "r", encoding="utf8") as file:
+            print("Start of the links processing (around 158kk)")
             counter = 0
             for line in file:
                 for match in re.finditer(pattern_links, line):
@@ -79,13 +83,3 @@ def generate_pages_links():
             json.dump(links, fp)
         print("Caching done")
     return links
-
-links = generate_pages_links()
-namespaces_sizes = [len(pages_in_namespace) for pages_in_namespace in links.values()]
-print("Number of pages with links stored: " + str(sum(namespaces_sizes)))
-
-first_namespace_dict = list(links.values())[0]
-first_page_links_per_namespace = list(first_namespace_dict.values())[0]
-print("first_page_links_per_namespace:")
-for namespace_id, page_links in first_page_links_per_namespace.items():
-    print("namespace:", namespace_id, page_links)
