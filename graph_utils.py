@@ -11,6 +11,11 @@ def dump(G, filename):
     directory.mkdir(parents=True, exist_ok=True)
     nx.write_gpickle(G, filename)
 
+def dump_geffi(G, filename):
+    directory = pathlib.Path(filename).parent
+    directory.mkdir(parents=True, exist_ok=True)
+    nx.write_gexf(G, filename)
+
 def load(filename):
     G = None
     if os.path.isfile(filename):
