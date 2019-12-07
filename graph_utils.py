@@ -9,17 +9,24 @@ import pylab
 def dump(G, filename):
     directory = pathlib.Path(filename).parent
     directory.mkdir(parents=True, exist_ok=True)
+    print("Dumping the graph into pickle in", filename)
     nx.write_gpickle(G, filename)
+    print("Dumping sucessful")
 
 def dump_geffi(G, filename):
     directory = pathlib.Path(filename).parent
     directory.mkdir(parents=True, exist_ok=True)
+    print("Dumping the graph into gexf format in", filename)
     nx.write_gexf(G, filename)
+    print("Dumping sucessful")
 
 def load(filename):
-    G = None
-    if os.path.isfile(filename):
-        G = nx.read_gpickle(filename)
+    print("Loading pickled graph from", filename)
+    if not os.path.isfile(filename):
+        print("There is no cached graph")
+        return None
+    G = nx.read_gpickle(filename)
+    print("Graph loaded from pickle")
     return G
 
 def plot_degrees_distribution(G):

@@ -15,7 +15,7 @@ def _prepare_title_cache(pages):
     title_cache = defaultdict(dict)
     pages_pattern = re.compile("\\((\\d+),(.+?),'(.*?)',.*?,NULL\\)")
     with open(pages, "r", encoding="utf8") as file:
-        print("Start of the pages processing (around 1300k)")
+        print("Start of the pages processing")
         counter = 0
         for line in file:
             for match in re.finditer(pages_pattern, line):
@@ -25,7 +25,7 @@ def _prepare_title_cache(pages):
                 title_cache[namespace_id][title] = page_id
 
                 counter += 1
-                if counter % 100000 == 0:
+                if counter % 10000 == 0:
                     print("Pages processed: " + str(counter//1000) + "k")
     print("Pages processed")
     return title_cache
@@ -33,7 +33,7 @@ def _prepare_title_cache(pages):
 def _prepare_graph(pagelinks, title_cache):
     G = nx.Graph()
     pattern_links = re.compile("\\((\\d+),(\\d+),'(.*?)',(\\d+)\\)[,;]")
-    print("Start of the links processing (around 59kk) and graph generation")
+    print("Start of the links processing and graph generation")
     with open(pagelinks, "r", encoding="utf8") as file:
         counter = 0
         for line in file:
@@ -53,7 +53,7 @@ def _prepare_graph(pagelinks, title_cache):
                 G.add_edge(from_node, to_node)
 
                 counter += 1
-                if counter % 1000000 == 0:
-                    print("Links processed: " + str(counter//1000000) + "kk")
-    print("Links processed, graph generated")    
+                if counter % 100000 == 0:
+                    print("Links processed: " + str(counter//1000) + "k")
+    print("Links processed, graph generated")
     return G
