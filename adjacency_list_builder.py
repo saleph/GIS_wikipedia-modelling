@@ -6,9 +6,9 @@ import pathlib
 from collections import defaultdict
 import networkx as nx
 
-def generate_graph(pages, pagelinks):
+def generate_graph(pages, pagelinks, G=nx.Graph()):
     title_cache = _prepare_title_cache(pages)
-    G = _prepare_graph(pagelinks, title_cache)   
+    G = _prepare_graph(pagelinks, title_cache, G)   
     return G
 
 def _prepare_title_cache(pages):
@@ -30,8 +30,7 @@ def _prepare_title_cache(pages):
     print("Pages processed")
     return title_cache
 
-def _prepare_graph(pagelinks, title_cache):
-    G = nx.Graph()
+def _prepare_graph(pagelinks, title_cache, G):
     pattern_links = re.compile("\\((\\d+),(\\d+),'(.*?)',(\\d+)\\)[,;]")
     print("Start of the links processing and graph generation")
     with open(pagelinks, "r", encoding="utf8") as file:
