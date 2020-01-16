@@ -65,11 +65,11 @@ if __name__ == "__main__":
         exit(1)
     pages = sys.argv[1]
     pagelinks = sys.argv[2]
+    
+    check_shortest_path = False
     if len(sys.argv) == 4:
         if re.match(r"true", sys.argv[3].strip(), re.IGNORECASE):
             check_shortest_path = True
-    else:
-        check_shortest_path = False
     #graph_utils.dump_geffi(nx.barabasi_albert_graph(yi_nodes_no, 22), graph_BA_model_geffi_filename)
     #ba = analyze_ba(yi_nodes_no, 22)
     #graph_utils.dump_json(ba, BA_modeling_yi_properties_filename)
