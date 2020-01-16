@@ -1,4 +1,5 @@
 import os
+import sys
 from adjacency_list_builder import generate_graph
 import networkx as nx
 import graph_utils
@@ -25,16 +26,19 @@ seed = 1234
 
 yi_nodes_no = 37712
 
-def printSomeThingsRegardingGraph(G):
-    properties = graph_utils.load_json(graph_properties_filename)
-    if properties is None:
-        properties = graph_utils.get_properties(G)
-        graph_utils.dump_json(properties, graph_properties_filename)
+def print_help():
+    print('Usage: python3 main.py <path to -page.sql> <path to -pagelinks.sql>')
+    print('Example: python3 main.py "C:/Users/tomas/Downloads/data/yiwiki-latest-page.sql" "C:/Users/tomas/Downloads/data/yiwiki-latest-pagelinks.sql"')
 
+def printSomeThingsRegardingGraph(G, check_shortest_path):
+    if not check_shortest_path:
+        print("Now some computation will be done. Will take approx. 2-3 minutes")
+    else:
+        print("Now some computation will be done. Will take approx. 10 minutes")
+    properties = graph_utils.get_properties(G, check_shortest_path)
     print("Graph properties")
     print('\n'.join([str(i) for i in properties.items()]))
-
-    #graph_utils.plot_degrees_distribution(G)
+    graph_utils.plot_degrees_distribution(G)
     #graph_utils.plot_clustering_coefficiences_distribution(G)
 
 def analyze_ba_spectrum(nodes = 10000):
@@ -54,16 +58,21 @@ def analyze_ba(nodes, m):
     return props
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print_help()
+        exit(1)
+    pages = sys.argv[1]
+    pagelinks = sys.argv[2]
     #graph_utils.dump_geffi(nx.barabasi_albert_graph(yi_nodes_no, 22), graph_BA_model_geffi_filename)
     #ba = analyze_ba(yi_nodes_no, 22)
     #graph_utils.dump_json(ba, BA_modeling_yi_properties_filename)
     #ba = analyze_ba_spectrum(yi_nodes_no)
     #graph_utils.dump_json(ba, BA_properties_filename_37k)
-    graph_utils.dump_geffi(nx.barabasi_albert_graph(yi_nodes_no, 50), graph_BA_model_geffi_m50_filename)
-    # G = graph_utils.load(graph_cache_filename)
-    # if G is None:
-    #     G = generate_graph(pages, pagelinks, nx.Graph())
-    #     graph_utils.dump(G, graph_cache_filename)
-    # #graph_utils.dump_geffi(G, graph_geffi_filename)
-    # printSomeThingsRegardingGraph(G)
-    # #graph_utils.draw(G)
+    #graph_utils.dump_geffi(nx.barabasi_albert_graph(yi_nodes_no, 50), graph_BA_model_geffi_m50_filename)
+
+    G = graph_utils.load(graph_cache_filename)
+    if G is None:
+        G = generate_graph(pages, pagelinks, nx.Graph())
+        graph_utils.dump(G, graph_cache_filename)
+    graph_utils.dump_geffi(G, graph_geffi_filename)
+    printSomeThingsRegardingGraph(G, check_shortest_path=True)
