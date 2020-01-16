@@ -4,6 +4,7 @@ from adjacency_list_builder import generate_graph
 import networkx as nx
 import graph_utils
 import json
+import re
 
 lang = "yi"
 dir_with_sql = "C:/Users/tomas/Downloads/data/"
@@ -27,14 +28,15 @@ seed = 1234
 yi_nodes_no = 37712
 
 def print_help():
-    print('Usage: python3 main.py <path to -page.sql> <path to -pagelinks.sql>')
-    print('Example: python3 main.py "C:/Users/tomas/Downloads/data/yiwiki-latest-page.sql" "C:/Users/tomas/Downloads/data/yiwiki-latest-pagelinks.sql"')
+    print('Usage: python3 main.py <path to -page.sql> <path to -pagelinks.sql> [check for avg shortest path]')
+    print("Note: check for avg shortest path will take a lot of time! Consider using Gephi for that")
+    print('Example: python3 main.py "packed_data/yiwiki-latest-page.sql" "packed_data/yiwiki-latest-pagelinks.sql" true')
 
 def printSomeThingsRegardingGraph(G, check_shortest_path):
     if not check_shortest_path:
         print("Now some computation will be done. Will take approx. 2-3 minutes")
     else:
-        print("Now some computation will be done. Will take approx. 10 minutes")
+        print("Now some computation will be done. Will take approx. 40 minutes because of check_shortest_path method. Consider using generated geffi file in Gephi for shortest path checking")
     properties = graph_utils.get_properties(G, check_shortest_path)
     print("Graph properties")
     print('\n'.join([str(i) for i in properties.items()]))
@@ -58,11 +60,16 @@ def analyze_ba(nodes, m):
     return props
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3:
         print_help()
         exit(1)
     pages = sys.argv[1]
     pagelinks = sys.argv[2]
+    if len(sys.argv) == 4:
+        if re.match(r"true", sys.argv[3].strip(), re.IGNORECASE):
+            check_shortest_path = True
+    else:
+        check_shortest_path = False
     #graph_utils.dump_geffi(nx.barabasi_albert_graph(yi_nodes_no, 22), graph_BA_model_geffi_filename)
     #ba = analyze_ba(yi_nodes_no, 22)
     #graph_utils.dump_json(ba, BA_modeling_yi_properties_filename)
@@ -75,4 +82,4 @@ if __name__ == "__main__":
         G = generate_graph(pages, pagelinks, nx.Graph())
         graph_utils.dump(G, graph_cache_filename)
     graph_utils.dump_geffi(G, graph_geffi_filename)
-    printSomeThingsRegardingGraph(G, check_shortest_path=True)
+    printSomeThingsRegardingGraph(G, check_shortest_path=check_shortest_path)

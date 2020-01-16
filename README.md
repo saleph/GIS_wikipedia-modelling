@@ -12,6 +12,6 @@ Unzip the data from directory packed_data (using 7zip).
 
 ## Run
 ```bash
-python3 main.py <path to -page.sql> <path to -pagelinks.sql>
+python3 main.py <path to -page.sql> <path to -pagelinks.sql> [check for avg shortest path]
 python3 main.py "packed_data/yiwiki-latest-page.sql" "packed_data/yiwiki-latest-pagelinks.sql"
 ```
