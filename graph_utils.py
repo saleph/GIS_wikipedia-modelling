@@ -18,25 +18,30 @@ def load_json(filename):
 
 def dump_json(dictionary, filename):
     with open(filename, 'w') as f:
-        f.write(json.dumps(dictionary))
+        f.write(json.dumps(dictionary, indent=4))
 
-def get_properties(G):
+def get_properties(G, check_shortest_path=False):
     print("Getting properties")
 
-    print("Get avg shortest path")
-    if nx.is_connected(G):
-        avg_path_len = nx.average_shortest_path_length(G)
-    else:
-        avg_path_len = mean([nx.average_shortest_path_length(G.subgraph(nodes)) for nodes in nx.connected_components(G)])
+    avg_path_len=None
+    if check_shortest_path:
+        print("Get avg shortest path")
+        if nx.is_connected(G):
+            avg_path_len = nx.average_shortest_path_length(G)
+        else:
+            avg_path_len = mean([nx.average_shortest_path_length(G.subgraph(nodes)) for nodes in nx.connected_components(G)])
 
     print("Get nodes number")
     nodes_number = len(G.nodes())
+    print(nodes_number)
 
     print("Get avg degree")
     avg_deg = mean([d for n, d in G.degree])
+    print(avg_deg)
 
     print("Get avg clustering coeff")
     avg_clustering = nx.average_clustering(G)
+    print(avg_clustering)
 
     return dict(
         nodes_number=nodes_number,
